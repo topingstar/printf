@@ -1,46 +1,52 @@
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "holberton.h"
+#include <stddef.h>
 /**
- * _printf - is a function that selects the correct function to print.
- * @format: identifier to look for.
- * Return: the length of the string.
+ * _printf - recreates the printf function
+ * @format: string with format specifier
+ * Return: number of characters printed
  */
-int _printf(const char * const format, ...)
+int _printf(const char *format, ...)
 {
-convert_match m[] = {
-{"%s", printf_string}, {"%c", printf_char},
-{"%%", printf_37},
-{"%i", printf_int}, {"%d", printf_dec}, {"%r", printf_srev},
-{"%R", printf_rot13}, {"%b", printf_bin}, {"%u", printf_unsigned},
-{"%o", printf_oct}, {"%x", printf_hex}, {"%X", printf_HEX},
-{"%S", printf_exclusive_string}, {"%p", printf_pointer}
-};
-
+if (format != NULL)
+{
+int count = 0, i;
+int (*m)(va_list);
 va_list args;
-int i = 0, j, len = 0;
 
 va_start(args, format);
-if (format == NULL || (format[0] == '%' && format[1] == '\0'))
+i = 0;
+if (format[0] == '%' && format[1] == '\0')
 return (-1);
-
-Here:
-while (format[i] != '\0')
+while (format != NULL && format[i] != '\0')
 {
-j = 13;
-while (j >= 0)
+if (format[i] == '%')
 {
-if (m[j].id[0] == format[i] && m[j].id[1] == format[i + 1])
+if (format[i + 1] == '%')
 {
-len += m[j].f(args);
-i = i + 2;
-goto Here;
+count += _putchar(format[i]);
+i += 2;
 }
-j--;
+else
+{
+m = get_func(format[i + 1]);
+if (m)
+count += m(args);
+else
+count = _putchar(format[i]) + _putchar(format[i + 1]);
+i += 2;
 }
-_putchar(format[i]);
-len++;
+}
+else
+{
+count += _putchar(format[i]);
 i++;
 }
-va_end(args);
-return (len);
 }
-
+va_end(args);
+return (count);
+}
+return (-1);
+}
